@@ -1,0 +1,16 @@
+{
+  "name": "grpc-playground-server",
+  "version": "1.0.0",
+  "main": "src/index.js",
+  "license": "MIT",
+  "repository": "git@github.com:esmail-elmoussel/grpc-playground.git",
+  "author": "Esmail Elmoussel <elmoussel12@gmail.com>",
+  "scripts": {
+    "start": "nodemon src/index.ts"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.3",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3"
+  }
+}
