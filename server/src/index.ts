@@ -4,6 +4,8 @@ const PORT = 40000;
 import {
   CreateTodoRequestDto,
   CreateTodoResponseDto,
+  GetTodosRequestDto,
+  GetTodosResponseDto,
   Todo,
 } from "../../common/types/todo.types";
 import * as grpc from "@grpc/grpc-js";
@@ -20,7 +22,7 @@ const todos: Todo[] = [];
 const createTodo = (
   call: grpc.ServerUnaryCall<CreateTodoRequestDto, CreateTodoResponseDto>,
   callback: grpc.sendUnaryData<CreateTodoResponseDto>
-) => {
+): void => {
   console.info(
     `[createTodo]: trying to create todo with request ${JSON.stringify(
       call.request
@@ -40,16 +42,23 @@ const createTodo = (
   return callback(null, todo);
 };
 
-// const getTodos = (): Todo[] => {
-//   return todos;
-// };
+const getTodos = (
+  _: grpc.ServerUnaryCall<GetTodosRequestDto, GetTodosResponseDto>,
+  callback: grpc.sendUnaryData<GetTodosResponseDto>
+): void => {
+  console.info(
+    `[getTodos]: Successfully getting todos: ${JSON.stringify(todos)}`
+  );
+
+  return callback(null, { todos });
+};
 
 const startServer = () => {
   console.info("[startServer]: Starting server...");
   const server = new grpc.Server();
 
   // @ts-ignore
-  server.addService(todoPackage.TodoService.service, { createTodo });
+  server.addService(todoPackage.TodoService.service, { createTodo, getTodos });
 
   server.bindAsync(
     `localhost:${PORT}`,
