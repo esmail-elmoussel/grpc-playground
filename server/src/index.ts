@@ -1,35 +1,28 @@
-const PROTO_PATH = __dirname + "/../../common/protos/todo.proto";
 const PORT = 40000;
 
-import {
-  CreateTodoRequestDto,
-  CreateTodoResponseDto,
-  GetTodosRequestDto,
-  GetTodosResponseDto,
-  Todo,
-} from "../../common/types/todo.types";
+import { Todo } from "../../common/types/todo.types";
 import * as grpc from "@grpc/grpc-js";
-import * as protoLoader from "@grpc/proto-loader";
-
-const protoLoaderOptions: protoLoader.Options = {};
-
-const packageDefinition = protoLoader.loadSync(PROTO_PATH, protoLoaderOptions);
-
-const todoPackage = grpc.loadPackageDefinition(packageDefinition).todoPackage;
+import { TodoServiceService } from "../../common/build/todo_grpc_pb";
+import {
+  CreateTodoDto,
+  TodoDto,
+  Empty,
+  TodosDto,
+} from "../../common/build/todo_pb";
 
 const todos: Todo[] = [];
 
 const createTodo = (
-  call: grpc.ServerUnaryCall<CreateTodoRequestDto, CreateTodoResponseDto>,
-  callback: grpc.sendUnaryData<CreateTodoResponseDto>
+  call: grpc.ServerUnaryCall<CreateTodoDto, TodoDto>,
+  callback: grpc.sendUnaryData<TodoDto>
 ): void => {
+  const request = call.request.toObject();
+
   console.info(
     `[createTodo]: trying to create todo with request ${JSON.stringify(
-      call.request
+      request
     )}`
   );
-
-  const request = call.request;
 
   const todo: Todo = { id: todos.length + 1, text: request.text };
 
@@ -39,26 +32,37 @@ const createTodo = (
     `[createTodo]: Successfully created todo: ${JSON.stringify(todo)}`
   );
 
-  return callback(null, todo);
+  const response = new TodoDto();
+
+  response.setId(todo.id).setText(todo.text);
+
+  return callback(null, response);
 };
 
 const getTodos = (
-  _: grpc.ServerUnaryCall<GetTodosRequestDto, GetTodosResponseDto>,
-  callback: grpc.sendUnaryData<GetTodosResponseDto>
+  _: grpc.ServerUnaryCall<Empty, TodosDto>,
+  callback: grpc.sendUnaryData<TodosDto>
 ): void => {
   console.info(
     `[getTodos]: Successfully getting todos: ${JSON.stringify(todos)}`
   );
 
-  return callback(null, { todos });
+  const response = new TodosDto();
+
+  response.setTodosList(
+    todos.map((todo) => new TodoDto().setId(todo.id).setText(todo.text))
+  );
+
+  response.addTodos(new TodoDto().setId(1564).setText("kaka"));
+
+  return callback(null, response);
 };
 
 const startServer = () => {
   console.info("[startServer]: Starting server...");
   const server = new grpc.Server();
 
-  // @ts-ignore
-  server.addService(todoPackage.TodoService.service, { createTodo, getTodos });
+  server.addService(TodoServiceService, { createTodo, getTodos });
 
   server.bindAsync(
     `localhost:${PORT}`,
