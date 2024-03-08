@@ -4,6 +4,7 @@ const PORT = 40000;
 import {
   CreateTodoRequestDto,
   CreateTodoResponseDto,
+  GetTodosResponseDto,
 } from "../../common/types/todo.types";
 import * as grpc from "@grpc/grpc-js";
 import * as protoLoader from "@grpc/proto-loader";
@@ -35,5 +36,21 @@ client.createTodo(
     }
 
     console.info(`Successfully created todo: ${JSON.stringify(data)}`);
+  }
+);
+
+client.getTodos(
+  null,
+  (
+    error: Partial<grpc.StatusObject> | grpc.ServerErrorResponse | null,
+    data?: GetTodosResponseDto | null
+  ) => {
+    if (error || !data) {
+      return console.error(
+        `Error while getting todos: ${JSON.stringify(error)}`
+      );
+    }
+
+    console.info(`Successfully got todos: ${JSON.stringify(data.todos)}`);
   }
 );
