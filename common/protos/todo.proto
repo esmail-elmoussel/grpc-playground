@@ -1,6 +1,6 @@
-import "google/protobuf/empty.proto";
-
 syntax = "proto3";
+
+import "google/protobuf/empty.proto";
 
 package todoPackage;
 
