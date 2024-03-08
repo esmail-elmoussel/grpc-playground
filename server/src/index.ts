@@ -21,13 +21,21 @@ const createTodo = (
   call: grpc.ServerUnaryCall<CreateTodoRequestDto, CreateTodoResponseDto>,
   callback: grpc.sendUnaryData<CreateTodoResponseDto>
 ) => {
-  console.log({ call, callback });
+  console.info(
+    `[createTodo]: trying to create todo with request ${JSON.stringify(
+      call.request
+    )}`
+  );
 
   const request = call.request;
 
   const todo: Todo = { id: todos.length + 1, text: request.text };
 
   todos.push(todo);
+
+  console.info(
+    `[createTodo]: Successfully created todo: ${JSON.stringify(todo)}`
+  );
 
   return callback(null, todo);
 };
@@ -48,7 +56,7 @@ const startServer = () => {
     grpc.ServerCredentials.createInsecure(),
     (error, port) => {
       if (error) {
-        console.error(error);
+        console.error(JSON.stringify(error));
 
         throw error;
       }
