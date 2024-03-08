@@ -1,7 +1,11 @@
 const PROTO_PATH = __dirname + "/../../common/protos/todo.proto";
 const PORT = 40000;
 
-import { Todo } from "../../common/types/todo.types";
+import {
+  CreateTodoRequestDto,
+  CreateTodoResponseDto,
+  Todo,
+} from "../../common/types/todo.types";
 import * as grpc from "@grpc/grpc-js";
 import * as protoLoader from "@grpc/proto-loader";
 
@@ -14,14 +18,14 @@ const todoPackage = grpc.loadPackageDefinition(packageDefinition).todoPackage;
 const todos: Todo[] = [];
 
 const createTodo = (
-  call: grpc.ServerUnaryCall<string, Todo>,
-  callback: grpc.sendUnaryData<Todo>
+  call: grpc.ServerUnaryCall<CreateTodoRequestDto, CreateTodoResponseDto>,
+  callback: grpc.sendUnaryData<CreateTodoResponseDto>
 ) => {
   console.log({ call, callback });
 
-  const text = call.request;
+  const request = call.request;
 
-  const todo = { id: todos.length + 1, text };
+  const todo: Todo = { id: todos.length + 1, text: request.text };
 
   todos.push(todo);
 
