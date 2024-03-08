@@ -1,7 +1,7 @@
-const PROTO_PATH = __dirname + "/../../protos/todo.proto";
+const PROTO_PATH = __dirname + "/../../common/protos/todo.proto";
 const PORT = 40000;
 
-import { Todo } from "./types/todo.types";
+import { Todo } from "../../common/types/todo.types";
 import * as grpc from "@grpc/grpc-js";
 import * as protoLoader from "@grpc/proto-loader";
 
@@ -40,7 +40,7 @@ const startServer = () => {
   server.addService(todoPackage.TodoService.service, { createTodo });
 
   server.bindAsync(
-    `0.0.0.0:${PORT}`,
+    `localhost:${PORT}`,
     grpc.ServerCredentials.createInsecure(),
     (error, port) => {
       if (error) {
