@@ -2,13 +2,8 @@ const PORT = 40000;
 
 import { Todo } from "../../common/types/todo.types";
 import * as grpc from "@grpc/grpc-js";
-import { TodoServiceService } from "../../common/build/todo_grpc_pb";
-import {
-  CreateTodoDto,
-  TodoDto,
-  Empty,
-  TodosDto,
-} from "../../common/build/todo_pb";
+import { CreateTodoDto, TodoDto, Empty, TodosDto } from "../../build/todo_pb";
+import { TodoServiceService } from "../../build/todo_grpc_pb";
 
 const todos: Todo[] = [];
 
@@ -52,8 +47,6 @@ const getTodos = (
   response.setTodosList(
     todos.map((todo) => new TodoDto().setId(todo.id).setText(todo.text))
   );
-
-  response.addTodos(new TodoDto().setId(1564).setText("kaka"));
 
   return callback(null, response);
 };
