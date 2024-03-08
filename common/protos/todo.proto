@@ -1,3 +1,5 @@
+import "google/protobuf/empty.proto";
+
 syntax = "proto3";
 
 package todoPackage;
@@ -11,6 +13,12 @@ message TodoDto {
     string text = 2;
 }
 
+message TodosDto {
+    repeated TodoDto todos = 1;
+}
+
 service TodoService {
     rpc createTodo(CreateTodoDto) returns (TodoDto);
+
+    rpc getTodos(google.protobuf.Empty) returns (TodosDto);
 }

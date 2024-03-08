@@ -8,3 +8,7 @@ export interface CreateTodoRequestDto {
 }
 
 export type CreateTodoResponseDto = Todo;
+
+export type GetTodosRequestDto = null;
+
+export type GetTodosResponseDto = { todos: Todo[] };
