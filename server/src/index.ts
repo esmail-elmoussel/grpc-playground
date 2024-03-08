@@ -1,6 +1,6 @@
 const PORT = 40000;
 
-import { Todo } from "../../common/types/todo.types";
+import { Todo } from "../types/todo.types";
 import * as grpc from "@grpc/grpc-js";
 import { CreateTodoDto, TodoDto, Empty, TodosDto } from "../../build/todo_pb";
 import { TodoServiceService } from "../../build/todo_grpc_pb";
