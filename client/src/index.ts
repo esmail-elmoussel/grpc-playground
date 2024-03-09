@@ -5,8 +5,11 @@ import { promisify } from "util";
 import { TodoServiceClient } from "../../build/todo_grpc_pb";
 import {
   CreateTodoRequestDto,
+  CreateTodoResponseDto,
   GetTodoRequestDto,
+  GetTodoResponseDto,
   GetTodosRequestDto,
+  GetTodosResponseDto,
 } from "../../build/todo_pb";
 
 const createClient = (): TodoServiceClient => {
@@ -28,66 +31,73 @@ const createClient = (): TodoServiceClient => {
 
 const client = createClient();
 
-const createTodo = (text: string) => {
+const createTodoRpc = promisify<CreateTodoRequestDto, CreateTodoResponseDto>(
+  client.createTodo
+).bind(client);
+
+const getTodosRpc = promisify<GetTodosRequestDto, GetTodosResponseDto>(
+  client.getTodos
+).bind(client);
+
+const getTodoRpc = promisify<GetTodoRequestDto, GetTodoResponseDto>(
+  client.getTodo
+).bind(client);
+
+const createTodo = async (text: string) => {
   const request: CreateTodoRequestDto = new CreateTodoRequestDto().setText(
     text
   );
 
-  client.createTodo(request, (error, response) => {
-    if (error) {
-      return console.error(
-        `Error while creating todo: ${JSON.stringify(error)}`
-      );
-    }
+  try {
+    const response = await createTodoRpc(request);
 
     console.info(
       `Successfully created todo: ${JSON.stringify(response.toObject())}`
     );
-  });
+  } catch (error) {
+    console.error(`Error while creating todo: ${error}`);
+  }
 };
 
-const getTodos = () => {
+const getTodos = async () => {
   const request: GetTodosRequestDto = new GetTodosRequestDto();
 
-  client.getTodos(request, (error, response) => {
-    if (error) {
-      return console.error(
-        `Error while getting todos: ${JSON.stringify(error)}`
-      );
-    }
+  try {
+    const response = await getTodosRpc(request);
 
     console.info(
       `Successfully got todos: ${JSON.stringify(response.toObject())}`
     );
-  });
+  } catch (error) {
+    return console.error(`Error while getting todos: ${error}`);
+  }
 };
 
-const getTodo = (id: number) => {
-  const request: GetTodoRequestDto = new GetTodoRequestDto().setId(id);
-
-  client.getTodo(request, (error, response) => {
-    if (error) {
-      return console.error(
-        `Error while getting todo with id ${request.getId()}: ${JSON.stringify(
-          error
-        )}`
-      );
-    }
+const getTodo = async (id: number) => {
+  try {
+    const request: GetTodoRequestDto = new GetTodoRequestDto().setId(id);
+    const response = await getTodoRpc(request);
 
     console.info(
       `Successfully got todo with id ${request.getId()}: ${JSON.stringify(
         response.toObject()
       )}`
     );
-  });
+  } catch (error) {
+    console.error(`Error while getting todo with id ${id}: ${error}`);
+  }
 };
 
-createTodo("Play with code!");
-createTodo("Watch match!");
-createTodo("Random!!");
-createTodo("Random!!");
-createTodo("Random!!");
+const main = async () => {
+  await createTodo("Play with code!");
+  createTodo("Watch match!");
+  createTodo("Random!!");
+  createTodo("Random!!");
+  createTodo("Random!!");
 
-getTodos();
+  getTodos();
 
-getTodo(1);
+  getTodo(1);
+};
+
+main();

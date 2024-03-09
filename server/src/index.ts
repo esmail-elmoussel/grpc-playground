@@ -103,7 +103,9 @@ const startServer = () => {
     grpc.ServerCredentials.createInsecure(),
     (error, port) => {
       if (error) {
-        console.error(JSON.stringify(error));
+        console.error(
+          `[startServer]: Error starting gRPC server: ${JSON.stringify(error)}`
+        );
 
         throw error;
       }
