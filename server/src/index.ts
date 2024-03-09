@@ -84,9 +84,9 @@ const getTodo = (
   response.setTodo(new TodoDto().setId(todo.id).setText(todo.text));
 
   console.info(
-    `[getTodo]: Successfully got todo with id ${
-      request.id
-    }: ${response.toObject()}`
+    `[getTodo]: Successfully got todo with id ${request.id}: ${JSON.stringify(
+      response.toObject()
+    )}`
   );
 
   return callback(null, response);
