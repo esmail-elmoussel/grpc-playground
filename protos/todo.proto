@@ -2,23 +2,27 @@ syntax = "proto3";
 
 package todoPackage;
 
-message CreateTodoDto {
-    string text = 1;
-}
-
 message TodoDto {
     int32 id = 1;
     string text = 2;
 }
 
-message TodosDto {
+message CreateTodoRequestDto {
+    string text = 1;
+}
+
+message CreateTodoResponseDto {
+    TodoDto todo = 1;
+}
+
+message GetTodosRequestDto {}
+
+message GetTodosResponseDto {
     repeated TodoDto todos = 1;
 }
 
-message Empty {}
-
 service TodoService {
-    rpc createTodo(CreateTodoDto) returns (TodoDto);
+    rpc createTodo(CreateTodoRequestDto) returns (CreateTodoResponseDto);
 
-    rpc getTodos(Empty) returns (TodosDto);
+    rpc getTodos(GetTodosRequestDto) returns (GetTodosResponseDto);
 }

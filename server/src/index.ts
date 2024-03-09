@@ -1,15 +1,21 @@
 const PORT = 40000;
 
-import { Todo } from "../types/todo.types";
+import { Todo } from "./types/todo.types";
 import * as grpc from "@grpc/grpc-js";
-import { CreateTodoDto, TodoDto, Empty, TodosDto } from "../../build/todo_pb";
+import {
+  CreateTodoRequestDto,
+  CreateTodoResponseDto,
+  GetTodosRequestDto,
+  GetTodosResponseDto,
+  TodoDto,
+} from "../../build/todo_pb";
 import { TodoServiceService } from "../../build/todo_grpc_pb";
 
 const todos: Todo[] = [];
 
 const createTodo = (
-  call: grpc.ServerUnaryCall<CreateTodoDto, TodoDto>,
-  callback: grpc.sendUnaryData<TodoDto>
+  call: grpc.ServerUnaryCall<CreateTodoRequestDto, CreateTodoResponseDto>,
+  callback: grpc.sendUnaryData<CreateTodoResponseDto>
 ): void => {
   const request = call.request.toObject();
 
@@ -19,30 +25,34 @@ const createTodo = (
     )}`
   );
 
-  const todo: Todo = { id: todos.length + 1, text: request.text };
+  const todo: TodoDto = new TodoDto()
+    .setId(todos.length + 1)
+    .setText(request.text);
 
-  todos.push(todo);
+  todos.push(todo.toObject());
 
   console.info(
-    `[createTodo]: Successfully created todo: ${JSON.stringify(todo)}`
+    `[createTodo]: Successfully created todo: ${JSON.stringify(
+      todo.toObject()
+    )}`
   );
 
-  const response = new TodoDto();
+  const response = new CreateTodoResponseDto();
 
-  response.setId(todo.id).setText(todo.text);
+  response.setTodo(todo);
 
   return callback(null, response);
 };
 
 const getTodos = (
-  _: grpc.ServerUnaryCall<Empty, TodosDto>,
-  callback: grpc.sendUnaryData<TodosDto>
+  _: grpc.ServerUnaryCall<GetTodosRequestDto, GetTodosResponseDto>,
+  callback: grpc.sendUnaryData<GetTodosResponseDto>
 ): void => {
   console.info(
     `[getTodos]: Successfully getting todos: ${JSON.stringify(todos)}`
   );
 
-  const response = new TodosDto();
+  const response = new GetTodosResponseDto();
 
   response.setTodosList(
     todos.map((todo) => new TodoDto().setId(todo.id).setText(todo.text))
