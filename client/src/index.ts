@@ -2,7 +2,7 @@ const PORT = 40000;
 
 import * as grpc from "@grpc/grpc-js";
 import { promisify } from "util";
-import { TodoServiceClient } from "../../build/todo_grpc_pb";
+import { TodoClient } from "../../build/todo_grpc_pb";
 import {
   CreateTodoRequestDto,
   CreateTodoResponseDto,
@@ -12,9 +12,9 @@ import {
   GetTodosResponseDto,
 } from "../../build/todo_pb";
 
-const createClient = (): TodoServiceClient => {
+const createClient = (): TodoClient => {
   try {
-    const client: TodoServiceClient = new TodoServiceClient(
+    const client: TodoClient = new TodoClient(
       `localhost:${PORT}`,
       grpc.credentials.createInsecure()
     );

@@ -11,7 +11,7 @@ import {
   GetTodosResponseDto,
   TodoDto,
 } from "../../build/todo_pb";
-import { TodoServiceService } from "../../build/todo_grpc_pb";
+import { TodoService } from "../../build/todo_grpc_pb";
 
 const todos: Todo[] = [];
 
@@ -96,7 +96,7 @@ const startServer = () => {
   console.info("[startServer]: Starting server...");
   const server = new grpc.Server();
 
-  server.addService(TodoServiceService, { createTodo, getTodos, getTodo });
+  server.addService(TodoService, { createTodo, getTodos, getTodo });
 
   server.bindAsync(
     `localhost:${PORT}`,
