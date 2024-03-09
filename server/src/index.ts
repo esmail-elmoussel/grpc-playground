@@ -5,6 +5,8 @@ import * as grpc from "@grpc/grpc-js";
 import {
   CreateTodoRequestDto,
   CreateTodoResponseDto,
+  GetTodoRequestDto,
+  GetTodoResponseDto,
   GetTodosRequestDto,
   GetTodosResponseDto,
   TodoDto,
@@ -31,15 +33,15 @@ const createTodo = (
 
   todos.push(todo.toObject());
 
-  console.info(
-    `[createTodo]: Successfully created todo: ${JSON.stringify(
-      todo.toObject()
-    )}`
-  );
-
   const response = new CreateTodoResponseDto();
 
   response.setTodo(todo);
+
+  console.info(
+    `[createTodo]: Successfully created todo: ${JSON.stringify(
+      response.toObject()
+    )}`
+  );
 
   return callback(null, response);
 };
@@ -48,14 +50,43 @@ const getTodos = (
   _: grpc.ServerUnaryCall<GetTodosRequestDto, GetTodosResponseDto>,
   callback: grpc.sendUnaryData<GetTodosResponseDto>
 ): void => {
-  console.info(
-    `[getTodos]: Successfully getting todos: ${JSON.stringify(todos)}`
-  );
+  console.info(`[getTodos]: trying to get todos`);
 
   const response = new GetTodosResponseDto();
 
   response.setTodosList(
     todos.map((todo) => new TodoDto().setId(todo.id).setText(todo.text))
+  );
+
+  console.info(
+    `[getTodos]: Successfully got todos: ${JSON.stringify(response.toObject())}`
+  );
+
+  return callback(null, response);
+};
+
+const getTodo = (
+  call: grpc.ServerUnaryCall<GetTodoRequestDto, GetTodoResponseDto>,
+  callback: grpc.sendUnaryData<GetTodoResponseDto>
+): void => {
+  const request: GetTodoRequestDto.AsObject = call.request.toObject();
+
+  console.info(`[getTodo]: trying to get todo with id ${request.id}`);
+
+  const response = new GetTodoResponseDto();
+
+  const todo = todos.find((todo) => todo.id === request.id);
+
+  if (!todo) {
+    throw new Error(`Todo with id ${request.id} not found`);
+  }
+
+  response.setTodo(new TodoDto().setId(todo.id).setText(todo.text));
+
+  console.info(
+    `[getTodo]: Successfully got todo with id ${
+      request.id
+    }: ${response.toObject()}`
   );
 
   return callback(null, response);
@@ -65,7 +96,7 @@ const startServer = () => {
   console.info("[startServer]: Starting server...");
   const server = new grpc.Server();
 
-  server.addService(TodoServiceService, { createTodo, getTodos });
+  server.addService(TodoServiceService, { createTodo, getTodos, getTodo });
 
   server.bindAsync(
     `localhost:${PORT}`,

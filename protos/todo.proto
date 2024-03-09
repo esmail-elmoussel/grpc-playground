@@ -21,8 +21,18 @@ message GetTodosResponseDto {
     repeated TodoDto todos = 1;
 }
 
+message GetTodoRequestDto {
+    int32 id = 1;
+}
+
+message GetTodoResponseDto {
+    TodoDto todo = 1;
+}
+
 service TodoService {
     rpc createTodo(CreateTodoRequestDto) returns (CreateTodoResponseDto);
 
     rpc getTodos(GetTodosRequestDto) returns (GetTodosResponseDto);
+
+    rpc getTodo(GetTodoRequestDto) returns (GetTodoResponseDto);
 }
